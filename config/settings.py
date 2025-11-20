@@ -15,6 +15,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
+from celery.schedules import crontab
 
 load_dotenv()
 
@@ -142,13 +143,8 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 TIME_ZONE = "Europe/Moscow"
-
 USE_TZ = True
-
-
 USE_I18N = True
-
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -163,6 +159,19 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 AUTH_USER_MODEL = "users.User"
+
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BEAT_SCHEDULE = {
+    "send-habits-every-minute": {
+        "task": "habits.tasks.send_habit_notifications",
+        "schedule": crontab(minute="*"),
+    },
+}
 
 
 
