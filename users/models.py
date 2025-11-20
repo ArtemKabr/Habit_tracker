@@ -34,18 +34,26 @@ class User(AbstractBaseUser, PermissionsMixin):
     """Кастомная модель пользователя с авторизацией по email."""
 
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=50, blank=True)  # (я добавил)
-    last_name = models.CharField(max_length=50, blank=True)  # (я добавил)
+    first_name = models.CharField(max_length=50, blank=True)
+    last_name = models.CharField(max_length=50, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
     telegram_chat_id = models.CharField(
-        max_length=50,
-        blank=True,
+        max_length=100,
         null=True,
-        help_text="ID чата пользователя в Telegram для отправки уведомлений",
-    )  # (я добавил)
+        blank=True,
+        unique=True,
+        help_text="ID чата Telegram"
+    )
+
+    telegram_verify_code = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        help_text="Одноразовый код для привязки Telegram"
+    )
 
     objects = UserManager()
 
@@ -53,5 +61,4 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     def __str__(self):
-        """Возвращает строковое представление пользователя."""
         return self.email
