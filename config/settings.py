@@ -51,8 +51,11 @@ INSTALLED_APPS = [
     "users",
     "habits",
     "telegram_bot",
-
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
 ]
+
+
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -126,8 +129,11 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 5,
+
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -171,6 +177,14 @@ CELERY_BEAT_SCHEDULE = {
         "task": "habits.tasks.send_habit_notifications",
         "schedule": crontab(minute="*"),
     },
+}
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Habit Tracker API",
+    "DESCRIPTION": "Документация API трекера привычек",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 

@@ -6,8 +6,11 @@ from .views import RegisterView, ProfileView
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
-    path("profile/", ProfileView.as_view(), name="profile"),
-# JWT маршруты
+
+    # Исправленный маршрут (добавлен pk + правильное name)
+    path("profile/<int:pk>/", ProfileView.as_view(), name="user_profile"),
+
+    # JWT маршруты
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]

@@ -13,6 +13,10 @@ class HabitListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return Habit.objects.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        """Присваиваем текущего пользователя."""
+        serializer.save(user=self.request.user)
+
 
 class HabitRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     """Просмотр, изменение, удаление привычки."""
