@@ -147,6 +147,7 @@ pytest --cov=habits --cov=users --cov-report=term-missing
 ✔ Чистая структура проекта
 ✔ drf-spectacular — документация по API
 
+
 ## 🏁 Развёртывание
 
 ## Установка Redis (Windows)
@@ -177,6 +178,63 @@ celery -A config worker -l INFO --pool=solo
 Celery Beat:
 
 celery -A config beat -l INFO
+
+🐳 Запуск проекта в Docker
+
+Полностью автоматизированный запуск Habit Tracker (Django + PostgreSQL + Redis + Celery + Celery Beat).
+
+📁 Требования
+
+Перед запуском установите:
+
+Docker
+
+Docker Compose
+
+🚀 Полный запуск
+1. Собрать контейнеры
+docker compose build
+
+2. Запустить проект
+docker compose up
+
+
+После запуска доступны сервисы:
+
+Сервис	Порт	Описание
+Backend (Django)	9000	API сервер
+PostgreSQL	5432	База данных
+Redis	6379	брокер Celery
+Celery Worker	—	обработка задач
+Celery Beat	—	периодические задачи
+
+API доступно по адресу:
+
+http://localhost:9000/api/
+
+🔄 Перезапуск (без пересборки)
+docker compose down
+docker compose up
+
+🧹 Полный сброс контейнеров и данных PostgreSQL
+
+(удаляет том базы)
+
+docker compose down -v
+docker compose up --build
+
+🧪 Запуск тестов внутри контейнера
+docker exec -it habit_backend sh -c "pytest --ds=config.settings"
+
+🐚 Вход в контейнер Django
+docker exec -it habit_backend sh
+
+📦 Пример структуры docker-compose.yaml (используемой в проекте)
+backend → порт 9000  
+celery → worker  
+celery_beat → scheduler  
+redis → брокер  
+postgres → база данных
 
 
 ## 📦 Стек технологий
