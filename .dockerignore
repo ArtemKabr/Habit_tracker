@@ -1,0 +1,33 @@
+# Исключаем виртуальное окружение
+.venv/
+venv/
+env/
+
+# Poetry
+poetry.lock
+__pycache__/
+*.pyc
+
+# IDE
+.idea/
+.vscode/
+
+# Логи
+*.log
+
+# Git
+.git
+.gitignore
+
+# ОС мусор
+.DS_Store
+Thumbs.db
+
+# Python build
+build/
+dist/
+*.egg-info/
+
+# Не нужно копировать в контейнер
+README.md
+docker-compose.yaml
