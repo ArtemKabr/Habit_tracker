@@ -1,23 +1,34 @@
-# .venv
+# Virtual environments
 .venv/
 venv/
 
-# pycache
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Django stuff
+# Django
 *.log
 staticfiles/
 media/
+
+# Celery Beat local schedule file
+celerybeat-schedule
+
+# pytest cache
+.pytest_cache/
 
 # IDE
 .idea/
 .vscode/
 
-# OS
+# OS files
 .DS_Store
 
-# env files
+# Environment files
 .env
+.env.*
+!*.example
+
+# Docker
+*.pid
