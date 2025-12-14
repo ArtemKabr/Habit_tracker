@@ -10,7 +10,30 @@ on:
       - feature/ci-cd-deploy
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install --no-interaction
+
+      - name: Run flake8
+        run: |
+          flake8 .
+
   test:
+    needs: lint
     runs-on: ubuntu-latest
 
     services:
@@ -47,10 +70,6 @@ jobs:
           pip install poetry
           poetry config virtualenvs.create false
           poetry install --no-interaction
-
-      - name: Run flake8
-        run: |
-          flake8 .    
 
       - name: Create env file
         run: |
