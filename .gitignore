@@ -32,3 +32,7 @@ celerybeat-schedule
 
 # Docker
 *.pid
+
+# Celery beat
+celerybeat-schedule*
+
