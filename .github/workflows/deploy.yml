@@ -69,9 +69,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -84,7 +81,17 @@ jobs:
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             set -e
             cd ~/Habit_tracker
+
+            echo "Pull latest code"
             git pull origin develop
+
+            echo "Rebuild and restart containers"
             docker compose down
             docker compose up -d --build
+
+            echo "Collect static"
+            docker compose exec backend python manage.py collectstatic --noinput
+
+            echo "Deploy finished successfully"
           EOF
+  
