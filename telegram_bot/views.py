@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import TelegramConnectSerializer
 from .client import TelegramClient
-from users.models import User
+
 
 class TelegramConnectView(generics.GenericAPIView):
     """Принимает chat_id и привязывает его к текущему пользователю."""
