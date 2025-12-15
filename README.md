@@ -330,3 +330,6 @@ drf-spectacular
 ## 📤 GitHub
 
 git@github.com:ArtemKabr/Habit_tracker.git
+
+
+Автоматический деплой через GitHub Actions работает корректно.
