@@ -91,6 +91,7 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # (я добавил)
 
     steps:
       - name: Setup SSH
@@ -106,8 +107,9 @@ jobs:
             set -e
             cd ~/Habit_tracker
 
-            echo "Pull latest code"
-            git pull origin develop
+            echo "Sync code"
+            git fetch origin
+            git reset --hard origin/main
 
             echo "Rebuild and restart containers"
             docker compose down
@@ -118,4 +120,5 @@ jobs:
 
             echo "Deploy finished successfully"
           EOF
+  
   
