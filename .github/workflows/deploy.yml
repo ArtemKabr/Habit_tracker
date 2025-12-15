@@ -1,0 +1,121 @@
+# .github/workflows/deploy.yml
+# CI/CD: тесты + деплой на сервер по SSH
+
+name: CI/CD Deploy
+
+on:
+  push:
+    branches:
+      - develop
+      - feature/ci-cd-deploy
+
+jobs:
+  lint:
+    name: Flake8 lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install --no-interaction
+
+      - name: Run flake8
+        run: |
+          flake8 .
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: habit_tracker_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install --no-interaction
+
+      - name: Create env file
+        run: |
+          cp .env_template .env
+          sed -i 's/DEBUG=True/DEBUG=False/' .env
+          sed -i 's/DB_HOST=db/DB_HOST=localhost/' .env
+          sed -i 's/DB_USER=.*/DB_USER=postgres/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=postgres/' .env
+
+      - name: Run migrations
+        run: |
+          python manage.py migrate
+
+      - name: Run tests
+        run: |
+          python manage.py test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+            cd ~/Habit_tracker
+
+            echo "Pull latest code"
+            git pull origin develop
+
+            echo "Rebuild and restart containers"
+            docker compose down
+            docker compose up -d --build
+
+            echo "Collect static"
+            docker compose exec backend python manage.py collectstatic --noinput
+
+            echo "Deploy finished successfully"
+          EOF
+  
