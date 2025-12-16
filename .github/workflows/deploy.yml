@@ -6,8 +6,7 @@ name: CI/CD Deploy
 on:
   push:
     branches:
-      - develop
-      - feature/ci-cd-deploy
+      - "**"
 
 jobs:
   lint:
@@ -109,6 +108,7 @@ jobs:
   deploy:
     needs: docker-build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Setup SSH
