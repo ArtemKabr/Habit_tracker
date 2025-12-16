@@ -87,9 +87,27 @@ jobs:
       - name: Run tests
         run: |
           python manage.py test
+  
+
+  docker-build:
+    name: Docker build check
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker images
+        run: |
+          docker compose build
+
 
   deploy:
-    needs: test
+    needs: docker-build
     runs-on: ubuntu-latest
 
     steps:
